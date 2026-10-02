@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>진법 변환 마스터 - 중학교 2학년 정보</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans KR & Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;700;800&family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+        }
+        .font-mono-num {
+            font-family: 'Fira Code', monospace;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @keyframes bounceSlow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-bounce-slow {
+            animation: bounceSlow 2s infinite ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.3; transform: scale(0.98); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 1.8s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Header Navigation -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3 shrink-0">
+                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
+                        <i class="fa-solid fa-calculator text-2xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black text-slate-900 leading-tight">진법 변환 시각화 마스터</h1>
+                        <p class="text-xs text-indigo-600 font-bold">중학교 2학년 정보 · 디지털 표현 탐구</p>
+                    </div>
+                </div>
+
+                <!-- Prominent Navigation Mode Switcher -->
+                <nav class="flex flex-wrap justify-center gap-2 bg-slate-100 p-2 rounded-2xl border border-slate-200 shadow-inner w-full md:w-auto">
+                    <button id="tab-concept" onclick="switchMode('concept')" class="flex items-center space-x-2 px-5 py-3 rounded-xl transition-all duration-200 bg-white text-indigo-700 shadow-md font-extrabold text-base">
+                        <i class="fa-solid fa-book-open text-sm"></i>
+                        <span>① 진법 개요</span>
+                    </button>
+                    <button id="tab-dec2n" onclick="switchMode('dec2n')" class="flex items-center space-x-2 px-5 py-3 rounded-xl transition-all duration-200 text-slate-600 hover:text-slate-900 font-extrabold text-base">
+                        <i class="fa-solid fa-arrow-right-arrows-split text-sm"></i>
+                        <span>② 10진수 ➔ N진수</span>
+                    </button>
+                    <button id="tab-n2dec" onclick="switchMode('n2dec')" class="flex items-center space-x-2 px-5 py-3 rounded-xl transition-all duration-200 text-slate-600 hover:text-slate-900 font-extrabold text-base">
+                        <i class="fa-solid fa-arrow-left-long text-sm"></i>
+                        <span>③ N진수 ➔ 10진수</span>
+                    </button>
+                    <button id="tab-quiz" onclick="switchMode('quiz')" class="flex items-center space-x-2 px-5 py-3 rounded-xl transition-all duration-200 text-slate-600 hover:text-slate-900 font-extrabold text-base">
+                        <i class="fa-solid fa-graduation-cap text-sm"></i>
+                        <span>④ 실력 점검 퀴즈</span>
+                    </button>
+                </nav>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- SECTION 0: 진법 개요 -->
+        <section id="section-concept" class="space-y-6">
+            <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
+                <div class="relative z-10 max-w-3xl space-y-2">
+                    <span class="inline-block px-3 py-1 bg-indigo-500/30 border border-indigo-400/30 rounded-full text-xs font-bold text-indigo-200">카드를 클릭하여 상세 설명을 확인해보세요!</span>
+                    <h2 class="text-2xl md:text-3xl font-black tracking-tight">디지털 세상의 언어, 진법(Base) 탐구</h2>
+                    <p class="text-sm md:text-base text-slate-300 font-normal leading-relaxed pt-1">
+                        우리가 사용하는 10진수부터 컴퓨터의 기초가 되는 2진수, 8진수, 16진수까지! **각 카드를 클릭**하면 자세한 자릿수 원리와 활용 예시를 볼 수 있습니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- 4 Interactive Grid Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- 10진수 -->
+                <div onclick="openBaseModal('dec')" class="group bg-white hover:bg-blue-50/50 cursor-pointer rounded-2xl p-6 shadow-sm border-2 border-slate-200 hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between space-y-4 relative overflow-hidden">
+                    <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-blue-500">
+                        <i class="fa-solid fa-circle-info text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-black rounded-lg">Decimal</span>
+                            <span class="text-xs font-mono font-bold text-slate-400">(10)</span>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900 mb-1 group-hover:text-blue-600 transition">10진수 (Decimal)</h3>
+                        <p class="text-xs text-slate-500 mb-4">일상생활 속 우리의 언어</p>
+                        
+                        <div class="space-y-2 text-xs text-slate-700">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span class="font-bold text-slate-900 block mb-1">사용 숫자:</span>
+                                <span class="font-mono-num text-blue-600 font-extrabold">0, 1, 2, 3, 4, 5, 6, 7, 8, 9</span>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span class="font-bold text-slate-900 block mb-1">특징:</span>
+                                <span>10이 되면 자리 올림이 일어나는 진법입니다.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono-num">
+                        <span class="text-slate-400 font-sans text-[11px]">상세보기 Click ➔</span>
+                        <span class="font-bold text-blue-600 text-sm">25<sub class="text-[10px] text-slate-400">(10)</sub></span>
+                    </div>
+                </div>
+
+                <!-- 2진수 -->
+                <div onclick="openBaseModal('bin')" class="group bg-white hover:bg-emerald-50/50 cursor-pointer rounded-2xl p-6 shadow-sm border-2 border-slate-200 hover:border-emerald-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between space-y-4 relative overflow-hidden">
+                    <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-emerald-500">
+                        <i class="fa-solid fa-circle-info text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-black rounded-lg">Binary</span>
+                            <span class="text-xs font-mono font-bold text-slate-400">(2)</span>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900 mb-1 group-hover:text-emerald-600 transition">2진수 (Binary)</h3>
+                        <p class="text-xs text-slate-500 mb-4">컴퓨터의 유일한 언어</p>
+                        
+                        <div class="space-y-2 text-xs text-slate-700">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span class="font-bold text-slate-900 block mb-1">사용 숫자:</span>
+                                <span class="font-mono-num text-emerald-600 font-extrabold">0, 1</span>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span class="font-bold text-slate-900 block mb-1">특징:</span>
+                                <span>ON(1)과 OFF(0) 두 신호로 정보를 표현합니다.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono-num">
+                        <span class="text-slate-400 font-sans text-[11px]">상세보기 Click ➔</span>
+                        <span class="font-bold text-emerald-600 text-sm">11001<sub class="text-[10px] text-slate-400">(2)</sub></span>
+                    </div>
+                </div>
+
+                <!-- 8진수 -->
+                <div onclick="openBaseModal('oct')" class="group bg-white hover:bg-amber-50/50 cursor-pointer rounded-2xl p-6 shadow-sm border-2 border-slate-200 hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between space-y-4 relative overflow-hidden">
+                    <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-amber-500">
+                        <i class="fa-solid fa-circle-info text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-black rounded-lg">Octal</span>
+                            <span class="text-xs font-mono font-bold text-slate-400">(8)</span>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900 mb-1 group-hover:text-amber-600 transition">8진수 (Octal)</h3>
+                        <p class="text-xs text-slate-500 mb-4">2진수 3자리를 1개로 압축</p>
+                        
+                        <div class="space-y-2 text-xs text-slate-700">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span class="font-bold text-slate-900 block mb-1">사용 숫자:</span>
+                                <span class="font-mono-num text-amber-600 font-extrabold">0, 1, 2, 3, 4, 5, 6, 7</span>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span class="font-bold text-slate-900 block mb-1">특징:</span>
+                                <span>2진수를 3자리씩 묶어서 보기 편하게 표현합니다.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono-num">
+                        <span class="text-slate-400 font-sans text-[11px]">상세보기 Click ➔</span>
+                        <span class="font-bold text-amber-600 text-sm">31<sub class="text-[10px] text-slate-400">(8)</sub></span>
+                    </div>
+                </div>
+
+                <!-- 16진수 -->
+                <div onclick="openBaseModal('hex')" class="group bg-white hover:bg-rose-50/50 cursor-pointer rounded-2xl p-6 shadow-sm border-2 border-slate-200 hover:border-rose-400 transition-all duration-300 transform hover:-translate-y-1 flex flex-col justify-between space-y-4 relative overflow-hidden">
+                    <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity text-rose-500">
+                        <i class="fa-solid fa-circle-info text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 bg-rose-100 text-rose-800 text-xs font-black rounded-lg">Hexadecimal</span>
+                            <span class="text-xs font-mono font-bold text-slate-400">(16)</span>
+                        </div>
+                        <h3 class="text-xl font-extrabold text-slate-900 mb-1 group-hover:text-rose-600 transition">16진수 (Hex)</h3>
+                        <p class="text-xs text-slate-500 mb-4">알파벳 A~F를 사용하는 진법</p>
+                        
+                        <div class="space-y-2 text-xs text-slate-700">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span class="font-bold text-slate-900 block mb-1">사용 기호 (16개):</span>
+                                <span class="font-mono-num text-rose-600 font-extrabold">0~9, A, B, C, D, E, F</span>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                                <span class="font-bold text-slate-900 block mb-1">특징:</span>
+                                <span>2진수 4자리를 묶어 색상 코드 등에 쓰입니다.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono-num">
+                        <span class="text-slate-400 font-sans text-[11px]">상세보기 Click ➔</span>
+                        <span class="font-bold text-rose-600 text-sm">19<sub class="text-[10px] text-slate-400">(16)</sub></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Card -->
+            <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-2xl p-6 text-center space-y-3">
+                <h4 class="text-base font-bold text-indigo-900">개념을 확인하셨나요? 변환 실습 단계로 이동해보세요!</h4>
+                <div class="flex justify-center gap-3">
+                    <button onclick="switchMode('dec2n')" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center space-x-2">
+                        <span>② 10진수 ➔ N진수 변환 실습하기</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 1: 10진수 -> N진수 변환 -->
+        <section id="section-dec2n" class="space-y-6 hidden">
+            <!-- Controls Card -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+                    <!-- Input Number -->
+                    <div class="md:col-span-5">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">
+                            <i class="fa-solid fa-hashtag text-indigo-500 mr-1.5"></i>변환할 10진수 입력 (0 ~ 9999)
+                        </label>
+                        <div class="relative">
+                            <input type="number" id="dec-input" value="25" min="0" max="9999"
+                                class="w-full pl-4 pr-12 py-3 bg-slate-50 border border-slate-300 rounded-xl font-mono-num text-xl font-extrabold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                                placeholder="예: 25" oninput="resetDec2NAnimation()">
+                            <span class="absolute right-4 top-3.5 text-slate-400 font-bold text-sm">(10)</span>
+                        </div>
+                    </div>
+
+                    <!-- Target Base Selector -->
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">
+                            <i class="fa-solid fa-layer-group text-indigo-500 mr-1.5"></i>목표 진법 선택
+                        </label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button id="base-btn-2" onclick="setTargetBase(2)" class="py-3 rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 font-bold text-sm shadow-sm transition">
+                                2진수 (Bin)
+                            </button>
+                            <button id="base-btn-8" onclick="setTargetBase(8)" class="py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 font-semibold text-sm transition">
+                                8진수 (Oct)
+                            </button>
+                            <button id="base-btn-16" onclick="setTargetBase(16)" class="py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 font-semibold text-sm transition">
+                                16진수 (Hex)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Presets -->
+                    <div class="md:col-span-3 flex flex-col justify-end">
+                        <span class="text-xs text-slate-500 mb-2 font-medium">추천 예시 숫자:</span>
+                        <div class="flex space-x-2">
+                            <button onclick="setDecInput(13)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">13</button>
+                            <button onclick="setDecInput(25)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">25</button>
+                            <button onclick="setDecInput(174)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">174</button>
+                            <button onclick="setDecInput(255)" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">255</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HEX SPECIAL CONCEPT BANNER (Shows when 16진수 is selected) -->
+            <div id="hex-special-banner" class="hidden bg-gradient-to-r from-rose-500 via-rose-600 to-pink-600 text-white rounded-2xl p-5 shadow-md relative overflow-hidden transition-all animate-fade-in">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div class="flex items-start space-x-3.5">
+                        <div class="w-10 h-10 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center font-black text-xl shrink-0 mt-0.5">
+                            💡
+                        </div>
+                        <div class="space-y-1">
+                            <h4 class="text-base font-black text-white">핵심 질문: 왜 16진수는 10~15를 알파벳 A~F로 쓸까요?</h4>
+                            <p class="text-xs text-rose-100 leading-relaxed max-w-2xl">
+                                나눗셈 나머지로 <span class="bg-black/30 px-1.5 py-0.5 rounded font-mono font-bold text-amber-300">10</span>이 나왔을 때, 그대로 숫자 <span class="bg-black/30 px-1.5 py-0.5 rounded font-mono font-bold">10</span>이라고 적으면 사람들은 이것이 **"일-영(1과 0)"**인지 **"십(10)"**인지 구별할 수가 없습니다! 따라서 **한 자릿수 기호**인 <span class="bg-white text-rose-700 font-mono font-extrabold px-1.5 py-0.5 rounded">A, B, C, D, E, F</span>를 약속하여 사용합니다.
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Quick Map Badges -->
+                    <div class="bg-black/20 p-2.5 rounded-xl border border-white/20 shrink-0 grid grid-cols-3 gap-1.5 text-center font-mono-num text-xs">
+                        <span class="bg-white/10 px-2 py-1 rounded">10 ➔ <b>A</b></span>
+                        <span class="bg-white/10 px-2 py-1 rounded">11 ➔ <b>B</b></span>
+                        <span class="bg-white/10 px-2 py-1 rounded">12 ➔ <b>C</b></span>
+                        <span class="bg-white/10 px-2 py-1 rounded">13 ➔ <b>D</b></span>
+                        <span class="bg-white/10 px-2 py-1 rounded">14 ➔ <b>E</b></span>
+                        <span class="bg-white/10 px-2 py-1 rounded">15 ➔ <b>F</b></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Highly Visual Explainer Display -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Left Column: Step Division Board -->
+                <div class="lg:col-span-7 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col justify-between">
+                    <div>
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-lg font-bold text-slate-800">
+                                    <i class="fa-solid fa-stairs text-indigo-500 mr-2"></i>연속 나눗셈(몫 & 나머지) 시각화
+                                </h3>
+                                <p class="text-xs text-slate-500 mt-0.5">목표 진수 값으로 더 이상 나누어지지 않을 때까지 계속 나눕니다.</p>
+                            </div>
+                            <!-- Control Animation Buttons -->
+                            <div class="flex items-center space-x-2 shrink-0">
+                                <button onclick="prevDecStep()" id="btn-dec-prev" disabled class="px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg text-xs font-bold disabled:opacity-50">
+                                    <i class="fa-solid fa-chevron-left mr-1"></i>이전
+                                </button>
+                                <button onclick="nextDecStep()" id="btn-dec-next" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                                    다음 단계<i class="fa-solid fa-chevron-right ml-1"></i>
+                                </button>
+                                <button onclick="toggleDecAutoPlay()" id="btn-dec-auto" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold shadow-sm transition">
+                                    <i class="fa-solid fa-play mr-1"></i>자동 재생
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Division Steps Container -->
+                        <div id="division-steps-container" class="space-y-3 my-4 min-h-[280px] flex flex-col justify-center">
+                            <!-- JS dynamic insertion -->
+                        </div>
+                    </div>
+
+                    <!-- Highlight Reading Arrow Guide -->
+                    <div id="remainder-reading-guide" class="mt-4 p-4 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-lg hidden transition-all animate-fade-in">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 rounded-full bg-white/20 border border-white/30 text-white flex items-center justify-center font-black text-2xl shrink-0 animate-bounce-slow">
+                                <i class="fa-solid fa-arrow-up-long"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-base font-extrabold text-white">결과 읽기 방법: 아래에서 위로(역순)!</h4>
+                                <p class="text-xs text-amber-100 mt-0.5">나눗셈의 **마지막 몫과 역순으로 쌓인 나머지들**을 차례대로 나열하면 완벽한 변환 값이 완성됩니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Final Result Card & Quick Summary -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-md relative overflow-hidden">
+                        <div class="text-xs uppercase tracking-wider text-indigo-300 font-bold mb-1">Final Result</div>
+                        <h4 class="text-sm text-slate-300 mb-4">변환 결과</h4>
+
+                        <div id="dec2n-result-box" class="bg-white/10 backdrop-blur-md rounded-xl p-5 border border-white/10 text-center space-y-2">
+                            <div class="text-slate-300 text-xs font-mono">10진수 <span id="res-dec-original" class="text-amber-300 font-bold">25</span>는</div>
+                            <div id="res-converted-value" class="text-4xl font-extrabold font-mono-num tracking-wider text-emerald-400 py-2 drop-shadow-md">
+                                11001
+                            </div>
+                            <div class="inline-block px-3.5 py-1 bg-indigo-500/30 rounded-full text-xs font-bold text-indigo-200 border border-indigo-400/30">
+                                <span id="res-target-base-name">2진수</span> 표현법
+                            </div>
+                        </div>
+
+                        <!-- All Conversions Quick Summary Table -->
+                        <div class="mt-6 pt-4 border-t border-white/10 space-y-2 text-xs">
+                            <div class="text-slate-400 font-medium mb-2">동일한 수의 진법별 표현 비교:</div>
+                            <div class="grid grid-cols-3 gap-2 text-center font-mono-num">
+                                <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
+                                    <span class="block text-[10px] text-slate-400 font-sans">2진수 (Bin)</span>
+                                    <span id="quick-bin" class="text-amber-300 font-bold text-sm">11001</span>
+                                </div>
+                                <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
+                                    <span class="block text-[10px] text-slate-400 font-sans">8진수 (Oct)</span>
+                                    <span id="quick-oct" class="text-cyan-300 font-bold text-sm">31</span>
+                                </div>
+                                <div class="bg-white/5 p-2.5 rounded-xl border border-white/5">
+                                    <span class="block text-[10px] text-slate-400 font-sans">16진수 (Hex)</span>
+                                    <span id="quick-hex" class="text-rose-300 font-bold text-sm">19</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Teacher's Tip Box -->
+                    <div class="bg-indigo-50/80 border border-indigo-100 rounded-2xl p-5 text-xs text-slate-700 space-y-2">
+                        <div class="flex items-center space-x-2 text-indigo-900 font-bold text-sm mb-1">
+                            <i class="fa-solid fa-lightbulb text-amber-500 text-base"></i>
+                            <span>학습 꿀팁!</span>
+                        </div>
+                        <p class="text-slate-600 leading-relaxed">
+                            나눗셈의 나머지는 항상 **나누는 수(Base)보다 작은 숫자**만 나오게 됩니다! (예: 2진수는 0~1만, 8진수는 0~7만 발생)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: N진수 -> 10진수 변환 -->
+        <section id="section-n2dec" class="space-y-6 hidden">
+            <!-- Controls Card -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+                    <!-- Base Source Selection -->
+                    <div class="md:col-span-4">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">
+                            <i class="fa-solid fa-sliders text-indigo-500 mr-1.5"></i>입력 수의 진법 선택
+                        </label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button id="src-base-btn-2" onclick="setSourceBase(2)" class="py-3 rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 font-bold text-sm shadow-sm transition">
+                                2진수 (Bin)
+                            </button>
+                            <button id="src-base-btn-8" onclick="setSourceBase(8)" class="py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 font-semibold text-sm transition">
+                                8진수 (Oct)
+                            </button>
+                            <button id="src-base-btn-16" onclick="setSourceBase(16)" class="py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 font-semibold text-sm transition">
+                                16진수 (Hex)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Input Number -->
+                    <div class="md:col-span-5">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">
+                            <i class="fa-solid fa-pen-to-square text-indigo-500 mr-1.5"></i>N진수 값 입력
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="n2dec-input" value="1011"
+                                class="w-full pl-4 pr-16 py-3 bg-slate-50 border border-slate-300 rounded-xl font-mono-num text-xl font-extrabold uppercase text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition"
+                                placeholder="예: 1011" oninput="onN2DecInputChange()">
+                            <span id="src-base-badge" class="absolute right-4 top-3.5 text-indigo-600 font-bold text-sm">(2)</span>
+                        </div>
+                        <p id="n2dec-error-msg" class="text-xs text-rose-500 mt-1 font-semibold hidden">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i>선택한 진법에 올바르지 않은 숫자가 포함되어 있습니다.
+                        </p>
+                    </div>
+
+                    <!-- Presets -->
+                    <div class="md:col-span-3 flex flex-col justify-end">
+                        <span class="text-xs text-slate-500 mb-2 font-medium">추천 예시 버튼:</span>
+                        <div id="n2dec-presets" class="flex space-x-2">
+                            <!-- Dynamic presets -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Highly Visual Digit Breakdown Board -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-4 border-b border-slate-100">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">
+                            <i class="fa-solid fa-cubes-stacked text-indigo-500 mr-2"></i>각 자릿수 가중치 곱셈 시각화
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-0.5">맨 우측(0승 자리)부터 좌측으로 갈수록 진수의 제곱수로 자릿수 가중치가 늘어납니다.</p>
+                    </div>
+                </div>
+
+                <!-- Positional Expansion Cards Grid -->
+                <div id="n2dec-cards-container" class="flex flex-wrap gap-4 justify-center items-center py-4">
+                    <!-- JS generated digit card breakdown -->
+                </div>
+
+                <!-- Formula Construction View -->
+                <div class="bg-slate-900 text-slate-100 rounded-2xl p-6 font-mono-num space-y-4 shadow-inner">
+                    <div class="text-xs text-slate-400 font-sans font-semibold flex items-center justify-between">
+                        <span><i class="fa-solid fa-square-root-variable text-indigo-400 mr-1.5"></i>수식 전개 과정 (Calculation Steps)</span>
+                        <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-indigo-300">자릿수 × 진수<sup>승수</sup></span>
+                    </div>
+
+                    <div id="formula-step-1" class="text-sm md:text-base text-slate-200 overflow-x-auto pb-2"></div>
+                    <div id="formula-step-2" class="text-sm md:text-base text-amber-300 overflow-x-auto pb-2 border-t border-slate-800 pt-3"></div>
+
+                    <div class="border-t border-slate-800 pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-sans">
+                        <div class="text-xs text-slate-400">최종 10진수 합산 결과:</div>
+                        <div class="text-3xl font-extrabold text-emerald-400 font-mono-num">
+                            = <span id="n2dec-final-result">11</span> <span class="text-xs text-slate-400 font-sans">(10)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: 연습 퀴즈 (Quiz Mode) -->
+        <section id="section-quiz" class="space-y-6 hidden">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-slate-100 pb-4 mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 flex items-center">
+                            <i class="fa-solid fa-trophy text-amber-500 mr-2.5"></i>진법 변환 실력 점검 퀴즈
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">랜덤으로 출제되는 문제를 풀고 진법 변환 원리를 완벽하게 마스터하세요!</p>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100 text-center">
+                            <span class="block text-[10px] text-indigo-500 font-semibold uppercase">맞춘 문제</span>
+                            <span id="quiz-score" class="text-lg font-bold text-indigo-700">0 / 0</span>
+                        </div>
+                        <button onclick="generateQuiz()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center">
+                            <i class="fa-solid fa-arrows-rotate mr-2"></i>새 문제 풀어보기
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Card Container -->
+                <div class="max-w-3xl mx-auto bg-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200 space-y-6">
+                    <div class="text-center space-y-2">
+                        <span id="quiz-category-badge" class="inline-block px-3.5 py-1 bg-indigo-100 text-indigo-800 text-xs font-black rounded-full">
+                            10진수 ➔ 2진수
+                        </span>
+                        <h4 class="text-lg md:text-xl font-bold text-slate-800">다음 숫자를 올바르게 변환하세요!</h4>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 text-center shadow-xs space-y-1">
+                        <div class="text-xs text-slate-400 font-medium">주어진 문제</div>
+                        <div id="quiz-question-value" class="text-3xl md:text-4xl font-extrabold font-mono-num text-indigo-600">
+                            25 <span class="text-base text-slate-400 font-sans font-normal">(10)</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label class="block text-sm font-semibold text-slate-700 text-center">
+                            <span id="quiz-target-label">2진수</span> 변환 정답 입력:
+                        </label>
+                        <div class="flex max-w-md mx-auto gap-2">
+                            <input type="text" id="quiz-user-answer"
+                                class="flex-grow px-4 py-3 bg-white border border-slate-300 rounded-xl font-mono-num text-xl font-bold text-center text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 uppercase"
+                                placeholder="정답을 입력하세요" onkeydown="if(event.key==='Enter') checkQuizAnswer()">
+                            <button onclick="checkQuizAnswer()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm transition shrink-0">
+                                정답 확인
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="quiz-feedback" class="hidden p-4 rounded-xl text-center text-sm font-bold transition-all"></div>
+
+                    <!-- Extremely Detailed Solution View -->
+                    <div id="quiz-solution-box" class="hidden pt-4 border-t border-slate-200 space-y-3">
+                        <button onclick="toggleQuizExplanation()" class="w-full py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl font-bold transition flex items-center justify-center space-x-2 text-sm">
+                            <i class="fa-solid fa-list-check text-indigo-600"></i>
+                            <span>상세 단계별 풀이과정 보기 / 숨기기</span>
+                        </button>
+                        <div id="quiz-explanation-content" class="hidden p-5 bg-white rounded-2xl border border-indigo-100 shadow-sm space-y-4 text-slate-800 text-xs md:text-sm">
+                            <!-- JS Detailed Breakdown rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- CONCEPT DETAIL MODAL -->
+    <div id="concept-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden transition-opacity duration-300">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto relative animate-fade-in">
+            <!-- Modal Close Button -->
+            <button onclick="closeBaseModal()" class="absolute top-5 right-5 w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 rounded-full flex items-center justify-center transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Dynamic Modal Content -->
+            <div id="modal-content" class="space-y-6">
+                <!-- JS content -->
+            </div>
+
+            <!-- Bottom Close CTA -->
+            <div class="pt-4 border-t border-slate-100 flex justify-end">
+                <button onclick="closeBaseModal()" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm transition text-sm">
+                    확인했습니다
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="font-medium">중학교 2학년 정보 교과서 · 디지털 정보 표현 및 진법 탐구 학습 도구</p>
+            <p class="mt-1 text-slate-400">© 2026 Interactive Vibe Coding Education. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let currentMode = 'concept';
+        
+        let decInputVal = 25;
+        let targetBase = 2;
+        let decCurrentStep = 0;
+        let decTotalSteps = [];
+        let decAutoInterval = null;
+
+        let srcBase = 2;
+        let n2decInputVal = "1011";
+
+        let quizScoreCorrect = 0;
+        let quizScoreTotal = 0;
+        let currentQuizData = null;
+
+        window.onload = function() {
+            switchMode('concept');
+            initDec2N();
+            initN2DecPresets();
+            renderN2Dec();
+            generateQuiz();
+        };
+
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            document.getElementById('section-concept').classList.toggle('hidden', mode !== 'concept');
+            document.getElementById('section-dec2n').classList.toggle('hidden', mode !== 'dec2n');
+            document.getElementById('section-n2dec').classList.toggle('hidden', mode !== 'n2dec');
+            document.getElementById('section-quiz').classList.toggle('hidden', mode !== 'quiz');
+
+            const tabs = ['concept', 'dec2n', 'n2dec', 'quiz'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === mode) {
+                    btn.className = "flex items-center space-x-2 px-5 py-3 rounded-xl transition-all duration-200 bg-white text-indigo-700 shadow-md font-extrabold text-base";
+                } else {
+                    btn.className = "flex items-center space-x-2 px-5 py-3 rounded-xl transition-all duration-200 text-slate-600 hover:text-slate-900 font-extrabold text-base";
+                }
+            });
+
+            if (mode === 'dec2n') resetDec2NAnimation();
+        }
+
+        /* CONCEPT MODAL SYSTEM */
+        const conceptDetails = {
+            dec: {
+                title: "10진수 (Decimal)",
+                badge: "기본 진법 (Base-10)",
+                color: "blue",
+                desc: "우리가 세상을 살아가며 가장 자연스럽게 사용하는 진법입니다. 손가락이 10개인 점에 착안하여 발전했습니다.",
+                digits: "0, 1, 2, 3, 4, 5, 6, 7, 8, 9 (총 10개)",
+                rule: "숫자가 9 다음으로 넘어가면 자릿수가 늘어나서 '10'이 됩니다.",
+                example: "25 = (2 × 10¹) + (5 × 10⁰)",
+                useCase: "돈 계산, 시간(초/분), 일상생활 속 모든 숫자 표기"
+            },
+            bin: {
+                title: "2진수 (Binary)",
+                badge: "컴퓨터의 진법 (Base-2)",
+                color: "emerald",
+                desc: "컴퓨터의 반도체 스위치가 전기를 켜고(ON) 끄는(OFF) 원리에서 출발한 디지털 핵심 진법입니다.",
+                digits: "0, 1 (총 2개)",
+                rule: "1 다음 숫자가 오면 자릿수가 올라가서 '10(2)'이 됩니다.",
+                example: "11001(2) = (1×16) + (1×8) + (0×4) + (0×2) + (1×1) = 25",
+                useCase: "컴퓨터 메모리 데이터, 파일 저장(0과 1의 비트 수열), 로봇 제어"
+            },
+            oct: {
+                title: "8진수 (Octal)",
+                badge: "축약 표현 진법 (Base-8)",
+                color: "amber",
+                desc: "2진수 숫자가 너무 길어져서 사람이 읽기 불편할 때, 2진수 3자리를 하나로 묶어 표현한 진법입니다.",
+                digits: "0, 1, 2, 3, 4, 5, 6, 7 (총 8개)",
+                rule: "7 다음 숫자가 되면 자릿수가 올라가서 '10(8)'이 됩니다.",
+                example: "31(8) = (3 × 8¹) + (1 × 8⁰) = 24 + 1 = 25",
+                useCase: "리눅스/유닉스 OS의 파일 권한 설정 (chmod 755 등)"
+            },
+            hex: {
+                title: "16진수 (Hexadecimal)",
+                badge: "개발자 및 디지털 진법 (Base-16)",
+                color: "rose",
+                desc: "2진수 4자리를 한 글자로 표현합니다. 10부터 15까지는 한 자릿수로 표기하기 위해 알파벳 A~F를 사용합니다.",
+                digits: "0~9 및 A(=10), B(=11), C(=12), D(=13), E(=14), F(=15)",
+                rule: "15(F) 다음 숫자가 오면 자릿수가 올려져 '10(16)'이 됩니다.",
+                example: "19(16) = (1 × 16¹) + (9 × 16⁰) = 16 + 9 = 25",
+                useCase: "웹 컬러 코드(#FF0000 = 빨강), 메모리 주소(0x7FFF), MAC 주소"
+            }
+        };
+
+        function openBaseModal(key) {
+            const data = conceptDetails[key];
+            const modal = document.getElementById('concept-modal');
+            const content = document.getElementById('modal-content');
+
+            content.innerHTML = `
+                <div class="flex items-center space-x-3 border-b border-slate-100 pb-4">
+                    <div class="w-12 h-12 rounded-2xl bg-${data.color}-100 text-${data.color}-600 flex items-center justify-center font-black text-2xl">
+                        <i class="fa-solid fa-lightbulb"></i>
+                    </div>
+                    <div>
+                        <span class="px-2.5 py-0.5 bg-${data.color}-100 text-${data.color}-800 text-xs font-bold rounded-md">${data.badge}</span>
+                        <h3 class="text-2xl font-black text-slate-900 mt-0.5">${data.title}</h3>
+                    </div>
+                </div>
+
+                <p class="text-sm text-slate-600 leading-relaxed">${data.desc}</p>
+
+                <div class="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-100 text-xs">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                        <span class="font-bold text-slate-800"><i class="fa-solid fa-list-ol mr-1 text-indigo-500"></i>사용하는 기호:</span>
+                        <span class="font-mono-num font-bold text-${data.color}-600 text-sm">${data.digits}</span>
+                    </div>
+                    <div class="border-t border-slate-200/60 pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                        <span class="font-bold text-slate-800"><i class="fa-solid fa-arrow-up-right-dots mr-1 text-indigo-500"></i>자리 올림 규칙:</span>
+                        <span class="text-slate-600">${data.rule}</span>
+                    </div>
+                </div>
+
+                ${key === 'hex' ? `
+                    <div class="bg-rose-50/70 p-4 rounded-2xl border border-rose-100 space-y-2">
+                        <h4 class="text-xs font-bold text-rose-900"><i class="fa-solid fa-font mr-1"></i>16진수의 핵심! 알파벳 표기법</h4>
+                        <div class="grid grid-cols-6 gap-1.5 text-center font-mono-num text-xs">
+                            <div class="bg-white p-1.5 rounded border border-rose-200"><b>A</b> = 10</div>
+                            <div class="bg-white p-1.5 rounded border border-rose-200"><b>B</b> = 11</div>
+                            <div class="bg-white p-1.5 rounded border border-rose-200"><b>C</b> = 12</div>
+                            <div class="bg-white p-1.5 rounded border border-rose-200"><b>D</b> = 13</div>
+                            <div class="bg-white p-1.5 rounded border border-rose-200"><b>E</b> = 14</div>
+                            <div class="bg-white p-1.5 rounded border border-rose-200"><b>F</b> = 15</div>
+                        </div>
+                    </div>
+                ` : ''}
+
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold text-slate-700"><i class="fa-solid fa-calculator text-indigo-500 mr-1"></i>계산 예시:</h4>
+                    <div class="bg-slate-900 text-slate-100 p-3 rounded-xl font-mono-num text-xs text-center">
+                        ${data.example}
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <h4 class="text-xs font-bold text-slate-700"><i class="fa-solid fa-laptop-code text-indigo-500 mr-1"></i>실제 활용 사례:</h4>
+                    <p class="text-xs text-slate-600 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100 font-medium">${data.useCase}</p>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeBaseModal() {
+            document.getElementById('concept-modal').classList.add('hidden');
+        }
+
+        /* Mode 1 Logic (10진수 -> N진수) */
+        function setTargetBase(base) {
+            targetBase = base;
+            [2, 8, 16].forEach(b => {
+                const btn = document.getElementById(`base-btn-${b}`);
+                if (b === base) {
+                    btn.className = "py-3 rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 font-bold text-sm shadow-sm transition";
+                } else {
+                    btn.className = "py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 font-semibold text-sm transition";
+                }
+            });
+
+            const hexBanner = document.getElementById('hex-special-banner');
+            if (base === 16) hexBanner.classList.remove('hidden');
+            else hexBanner.classList.add('hidden');
+
+            resetDec2NAnimation();
+        }
+
+        function setDecInput(val) {
+            document.getElementById('dec-input').value = val;
+            resetDec2NAnimation();
+        }
+
+        function resetDec2NAnimation() {
+            if (decAutoInterval) {
+                clearInterval(decAutoInterval);
+                decAutoInterval = null;
+                document.getElementById('btn-dec-auto').innerHTML = `<i class="fa-solid fa-play mr-1"></i>자동 재생`;
+            }
+
+            let inputVal = parseInt(document.getElementById('dec-input').value);
+            if (isNaN(inputVal) || inputVal < 0) inputVal = 0;
+            if (inputVal > 9999) inputVal = 9999;
+            decInputVal = inputVal;
+
+            decTotalSteps = [];
+            let temp = decInputVal;
+
+            if (temp === 0) {
+                decTotalSteps.push({ dividend: 0, divisor: targetBase, quotient: 0, remainder: 0, remainderHex: '0' });
+            } else {
+                while (temp > 0) {
+                    let q = Math.floor(temp / targetBase);
+                    let r = temp % targetBase;
+                    let rHex = r >= 10 ? String.fromCharCode(55 + r) : r.toString();
+                    decTotalSteps.push({ dividend: temp, divisor: targetBase, quotient: q, remainder: r, remainderHex: rHex });
+                    temp = q;
+                }
+            }
+
+            decCurrentStep = 0;
+            renderDecSteps();
+            updateDecSummaryBox();
+        }
+
+        function prevDecStep() {
+            if (decCurrentStep > 0) {
+                decCurrentStep--;
+                renderDecSteps();
+            }
+        }
+
+        function nextDecStep() {
+            if (decCurrentStep < decTotalSteps.length) {
+                decCurrentStep++;
+                renderDecSteps();
+            }
+        }
+
+        function toggleDecAutoPlay() {
+            const autoBtn = document.getElementById('btn-dec-auto');
+            if (decAutoInterval) {
+                clearInterval(decAutoInterval);
+                decAutoInterval = null;
+                autoBtn.innerHTML = `<i class="fa-solid fa-play mr-1"></i>자동 재생`;
+            } else {
+                if (decCurrentStep >= decTotalSteps.length) decCurrentStep = 0;
+                autoBtn.innerHTML = `<i class="fa-solid fa-pause mr-1"></i>일시 정지`;
+                decAutoInterval = setInterval(() => {
+                    if (decCurrentStep < decTotalSteps.length) {
+                        decCurrentStep++;
+                        renderDecSteps();
+                    } else {
+                        clearInterval(decAutoInterval);
+                        decAutoInterval = null;
+                        autoBtn.innerHTML = `<i class="fa-solid fa-play mr-1"></i>자동 재생`;
+                    }
+                }, 900);
+            }
+        }
+
+        function renderDecSteps() {
+            const container = document.getElementById('division-steps-container');
+            container.innerHTML = '';
+
+            for (let i = 0; i < decCurrentStep; i++) {
+                const step = decTotalSteps[i];
+                const isCompleted = (decCurrentStep === decTotalSteps.length);
+
+                const stepEl = document.createElement('div');
+                stepEl.className = `p-4 rounded-2xl border transition-all duration-300 flex items-center justify-between font-mono-num ${
+                    isCompleted 
+                        ? 'bg-amber-50/80 border-amber-300 shadow-sm' 
+                        : (i === decCurrentStep - 1 ? 'bg-indigo-50 border-indigo-300 ring-2 ring-indigo-200' : 'bg-slate-50 border-slate-200')
+                }`;
+
+                let hexBadgeText = '';
+                if (targetBase === 16 && step.remainder >= 10) {
+                    hexBadgeText = `<span class="text-[10px] bg-rose-100 text-rose-800 font-bold font-sans px-2 py-0.5 rounded-full ml-1.5">10진수 ${step.remainder} ➔ '${step.remainderHex}'</span>`;
+                }
+
+                stepEl.innerHTML = `
+                    <div class="flex items-center space-x-3 text-sm md:text-base">
+                        <span class="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs font-sans shadow-xs">${i + 1}</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-slate-500 font-bold">${step.dividend}</span>
+                            <span class="text-indigo-600 font-extrabold">÷ ${step.divisor}</span>
+                        </div>
+                        <span class="text-slate-300">➔</span>
+                        <span class="text-slate-800 font-bold bg-white px-3 py-1 rounded-lg border border-slate-200">몫 ${step.quotient}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-slate-400 font-sans font-bold">나머지:</span>
+                        <span class="px-3.5 py-1.5 ${isCompleted ? 'bg-amber-500 animate-pulse-glow' : 'bg-indigo-600'} text-white font-black text-lg rounded-xl shadow-sm">
+                            ${step.remainderHex}
+                        </span>
+                        ${hexBadgeText}
+                    </div>
+                `;
+                container.appendChild(stepEl);
+            }
+
+            if (decCurrentStep === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-slate-400 space-y-2">
+                        <i class="fa-solid fa-circle-play text-4xl text-indigo-300 animate-bounce-slow"></i>
+                        <p class="text-sm font-bold font-sans text-slate-600">'다음 단계' 또는 '자동 재생'을 눌러 나눗셈 과정을 시각화해보세요!</p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('btn-dec-prev').disabled = (decCurrentStep === 0);
+            document.getElementById('btn-dec-next').disabled = (decCurrentStep >= decTotalSteps.length);
+
+            const guide = document.getElementById('remainder-reading-guide');
+            if (decCurrentStep === decTotalSteps.length && decTotalSteps.length > 0) {
+                guide.classList.remove('hidden');
+            } else {
+                guide.classList.add('hidden');
+            }
+        }
+
+        function updateDecSummaryBox() {
+            document.getElementById('res-dec-original').textContent = decInputVal;
+
+            const baseNames = { 2: '2진수', 8: '8진수', 16: '16진수' };
+            document.getElementById('res-target-base-name').textContent = baseNames[targetBase];
+
+            const converted = decInputVal.toString(targetBase).toUpperCase();
+            document.getElementById('res-converted-value').textContent = converted;
+
+            document.getElementById('quick-bin').textContent = decInputVal.toString(2);
+            document.getElementById('quick-oct').textContent = decInputVal.toString(8);
+            document.getElementById('quick-hex').textContent = decInputVal.toString(16).toUpperCase();
+        }
+
+        function initDec2N() {
+            setTargetBase(2);
+        }
+
+        /* Mode 2 Logic (N진수 -> 10진수) */
+        function setSourceBase(base) {
+            srcBase = base;
+            [2, 8, 16].forEach(b => {
+                const btn = document.getElementById(`src-base-btn-${b}`);
+                if (b === base) {
+                    btn.className = "py-3 rounded-xl border border-indigo-600 bg-indigo-50 text-indigo-700 font-bold text-sm shadow-sm transition";
+                } else {
+                    btn.className = "py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100 font-semibold text-sm transition";
+                }
+            });
+
+            document.getElementById('src-base-badge').textContent = `(${base})`;
+            initN2DecPresets();
+            renderN2Dec();
+        }
+
+        function initN2DecPresets() {
+            const container = document.getElementById('n2dec-presets');
+            let presets = [];
+            if (srcBase === 2) presets = ["1011", "11001", "11111111"];
+            else if (srcBase === 8) presets = ["31", "77", "124"];
+            else if (srcBase === 16) presets = ["19", "FF", "2A"];
+
+            container.innerHTML = presets.map(p => `
+                <button onclick="setN2DecInput('${p}')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition font-mono-num">${p}</button>
+            `).join('');
+
+            const currentVal = document.getElementById('n2dec-input').value;
+            if (!isValidBaseInput(currentVal, srcBase)) {
+                document.getElementById('n2dec-input').value = presets[0];
+            }
+        }
+
+        function setN2DecInput(val) {
+            document.getElementById('n2dec-input').value = val;
+            onN2DecInputChange();
+        }
+
+        function isValidBaseInput(str, base) {
+            if (!str) return false;
+            const regexes = {
+                2: /^[01]+$/,
+                8: /^[0-7]+$/,
+                16: /^[0-9a-fA-F]+$/
+            };
+            return regexes[base].test(str);
+        }
+
+        function onN2DecInputChange() {
+            const inputVal = document.getElementById('n2dec-input').value.trim();
+            const errorMsg = document.getElementById('n2dec-error-msg');
+
+            if (!isValidBaseInput(inputVal, srcBase)) {
+                errorMsg.classList.remove('hidden');
+                return;
+            } else {
+                errorMsg.classList.add('hidden');
+            }
+
+            renderN2Dec();
+        }
+
+        function renderN2Dec() {
+            const rawInput = document.getElementById('n2dec-input').value.trim().toUpperCase();
+            if (!isValidBaseInput(rawInput, srcBase)) return;
+
+            const cardsContainer = document.getElementById('n2dec-cards-container');
+            cardsContainer.innerHTML = '';
+
+            const digits = rawInput.split('');
+            const len = digits.length;
+
+            let totalSum = 0;
+            let step1Terms = [];
+            let step2Terms = [];
+
+            digits.forEach((char, index) => {
+                const power = len - 1 - index;
+                let digitValue = parseInt(char, srcBase);
+                let powerValue = Math.pow(srcBase, power);
+                let termSum = digitValue * powerValue;
+                totalSum += termSum;
+
+                step1Terms.push(`(${char} × ${srcBase}<sup>${power}</sup>)`);
+                step2Terms.push(`${termSum}`);
+
+                const card = document.createElement('div');
+                card.className = "flex flex-col items-center bg-indigo-50/50 border-2 border-indigo-100 rounded-2xl p-4 min-w-[95px] shadow-xs relative transition-all hover:scale-105 hover:border-indigo-400";
+                
+                let hexConvertedTag = '';
+                if (srcBase === 16 && isNaN(parseInt(char))) {
+                    hexConvertedTag = `<span class="text-[10px] text-rose-600 font-bold">(${char} ➔ ${digitValue})</span>`;
+                }
+
+                card.innerHTML = `
+                    <span class="text-[11px] font-bold text-indigo-500 font-sans mb-1">${srcBase}<sup>${power}</sup> 자리</span>
+                    <span class="text-3xl font-black font-mono-num text-slate-900 my-1">${char} ${hexConvertedTag}</span>
+                    <div class="text-[11px] font-mono-num text-slate-500 pt-1.5 border-t border-indigo-100 w-full text-center">
+                        ${digitValue} × ${powerValue}
+                    </div>
+                    <div class="text-xs font-black font-mono-num text-emerald-600 mt-1">
+                        = ${termSum}
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
+            });
+
+            document.getElementById('formula-step-1').innerHTML = step1Terms.join(' + ');
+            document.getElementById('formula-step-2').innerHTML = '= ' + step2Terms.join(' + ');
+            document.getElementById('n2dec-final-result').textContent = totalSum;
+        }
+
+        /* Mode 3 Logic (Quiz & Ultra Detailed Explanations) */
+        function generateQuiz() {
+            document.getElementById('quiz-feedback').className = 'hidden p-4 rounded-xl text-center text-sm font-bold transition-all';
+            document.getElementById('quiz-solution-box').classList.add('hidden');
+            document.getElementById('quiz-explanation-content').classList.add('hidden');
+            document.getElementById('quiz-user-answer').value = '';
+
+            const quizType = Math.floor(Math.random() * 4);
+            let num = Math.floor(Math.random() * 50) + 5;
+
+            if (quizType === 0) {
+                // 10 -> 2
+                currentQuizData = buildQuizData(num, 10, 2);
+            } else if (quizType === 1) {
+                // 10 -> 8
+                currentQuizData = buildQuizData(num, 10, 8);
+            } else if (quizType === 2) {
+                // 10 -> 16
+                num = Math.floor(Math.random() * 180) + 20;
+                currentQuizData = buildQuizData(num, 10, 16);
+            } else {
+                // 2 -> 10
+                currentQuizData = buildN2DecQuizData(num, 2);
+            }
+
+            document.getElementById('quiz-category-badge').textContent = currentQuizData.category;
+            document.getElementById('quiz-question-value').innerHTML = `${currentQuizData.questionText}`;
+            document.getElementById('quiz-target-label').textContent = currentQuizData.targetLabel;
+            document.getElementById('quiz-explanation-content').innerHTML = currentQuizData.detailedHtml;
+        }
+
+        function buildQuizData(decVal, fromBase, toBase) {
+            const baseNames = { 2: '2진수', 8: '8진수', 16: '16진수' };
+            const ans = decVal.toString(toBase).toUpperCase();
+
+            let divisionSteps = [];
+            let temp = decVal;
+
+            while (temp > 0) {
+                let q = Math.floor(temp / toBase);
+                let r = temp % toBase;
+                let rHex = r >= 10 ? String.fromCharCode(55 + r) : r.toString();
+                divisionSteps.push({ dividend: temp, quotient: q, remainder: r, remainderHex: rHex });
+                temp = q;
+            }
+
+            let stepsHtml = divisionSteps.map((s, idx) => {
+                let hexNote = (toBase === 16 && s.remainder >= 10) ? `<span class="text-rose-600 font-bold">(10진수 ${s.remainder} ➔ 16진수 문자 '${s.remainderHex}')</span>` : '';
+                return `
+                    <tr class="border-b border-slate-100">
+                        <td class="py-2 px-3 font-bold text-indigo-600">${idx + 1}단계</td>
+                        <td class="py-2 px-3 font-mono-num">${s.dividend} ÷ ${toBase}</td>
+                        <td class="py-2 px-3 font-mono-num font-bold">몫: ${s.quotient}</td>
+                        <td class="py-2 px-3 font-mono-num font-extrabold text-amber-600">나머지: ${s.remainderHex} ${hexNote}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            let html = `
+                <div class="space-y-4">
+                    <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl font-sans">
+                        <h5 class="font-extrabold text-indigo-900 text-sm mb-1"><i class="fa-solid fa-graduation-cap mr-1"></i>[풀이 1단계] ${toBase}로 더 이상 나누어지지 않을 때까지 연속 나눗셈</h5>
+                        <p class="text-xs text-slate-600">10진수 숫자를 ${baseNames[toBase]}의 기준 수인 <b>${toBase}</b>로 계속 나눕니다.</p>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse font-sans text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700">
+                                    <th class="py-2 px-3">단계</th>
+                                    <th class="py-2 px-3">나눗셈 식</th>
+                                    <th class="py-2 px-3">결과 몫</th>
+                                    <th class="py-2 px-3">나머지</th>
+                                </tr>
+                            </thead>
+                            <tbody>${stepsHtml}</tbody>
+                        </table>
+                    </div>
+
+                    ${toBase === 16 ? `
+                        <div class="p-3 bg-rose-50 border border-rose-100 rounded-xl text-xs space-y-1 font-sans">
+                            <span class="font-bold text-rose-800"><i class="fa-solid fa-font mr-1"></i>16진수 특별 규칙 점검:</span>
+                            <p class="text-rose-700">나머지가 10 이상인 경우: 10=A, 11=B, 12=C, 13=D, 14=E, 15=F로 꼭 치환해야 합니다.</p>
+                        </div>
+                    ` : ''}
+
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl font-sans space-y-1">
+                        <h5 class="font-extrabold text-amber-900 text-sm"><i class="fa-solid fa-arrow-up-long mr-1"></i>[풀이 2단계] 나머지를 '아래에서 위로' 역순 나열하기</h5>
+                        <p class="text-xs text-amber-800">구한 나머지들을 나중에 나온 것부터(아래에서 위로) 차례대로 모아서 적으면 정답이 됩니다!</p>
+                        <div class="text-base font-extrabold font-mono-num text-amber-600 pt-1">
+                            ➔ 최종 결과: <span class="text-xl bg-amber-200 text-amber-900 px-2 py-0.5 rounded">${ans}</span> <sub class="text-xs font-sans">(${toBase})</sub>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return {
+                category: `10진수 ➔ ${baseNames[toBase]}`,
+                questionText: `${decVal} <span class="text-base text-slate-400 font-sans font-normal">(10)</span>`,
+                targetLabel: baseNames[toBase],
+                answer: ans,
+                detailedHtml: html
+            };
+        }
+
+        function buildN2DecQuizData(decVal, srcB) {
+            const srcStr = decVal.toString(srcB);
+            const digits = srcStr.split('');
+            const len = digits.length;
+
+            let cardBreakdown = [];
+            let sumTerms = [];
+
+            digits.forEach((char, idx) => {
+                let power = len - 1 - idx;
+                let val = parseInt(char, srcB);
+                let powerVal = Math.pow(srcB, power);
+                let term = val * powerVal;
+                sumTerms.push(term);
+
+                cardBreakdown.push(`
+                    <div class="p-2 bg-slate-50 border border-slate-200 rounded-lg text-center font-mono-num">
+                        <span class="block text-[10px] text-slate-400 font-sans">${srcB}<sup>${power}</sup>자릿수</span>
+                        <span class="font-bold text-slate-800 text-sm">${char}</span>
+                        <span class="block text-[10px] text-indigo-600 pt-1 border-t border-slate-200">${val} × ${powerVal} = <b>${term}</b></span>
+                    </div>
+                `);
+            });
+
+            let html = `
+                <div class="space-y-4 font-sans">
+                    <div class="p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
+                        <h5 class="font-extrabold text-indigo-900 text-sm mb-1"><i class="fa-solid fa-calculator mr-1"></i>[풀이 1단계] 각 자릿수별 가중치($2^n$) 곱하기</h5>
+                        <p class="text-xs text-slate-600">오른쪽 맨 끝(0승 자리)부터 왼쪽으로 갈수록 진수의 제곱 수 만큼 가중치가 곱해집니다.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        ${cardBreakdown.join('')}
+                    </div>
+
+                    <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
+                        <h5 class="font-extrabold text-emerald-900 text-sm"><i class="fa-solid fa-plus mr-1"></i>[풀이 2단계] 계산된 모든 자릿수의 값 합산하기</h5>
+                        <div class="font-mono-num text-xs text-slate-700 py-1">
+                            ${sumTerms.join(' + ')} = <b class="text-lg text-emerald-700">${decVal}</b>
+                        </div>
+                        <div class="text-sm font-extrabold text-emerald-900">
+                            ➔ 최종 10진수 결과: <span class="bg-emerald-200 text-emerald-950 px-2.5 py-0.5 rounded font-mono-num text-lg">${decVal}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return {
+                category: '2진수 ➔ 10진수',
+                questionText: `${srcStr} <span class="text-base text-slate-400 font-sans font-normal">(2)</span>`,
+                targetLabel: '10진수',
+                answer: decVal.toString(10),
+                detailedHtml: html
+            };
+        }
+
+        function checkQuizAnswer() {
+            const userAns = document.getElementById('quiz-user-answer').value.trim().toUpperCase();
+            if (!userAns) return;
+
+            quizScoreTotal++;
+            const feedbackBox = document.getElementById('quiz-feedback');
+            document.getElementById('quiz-solution-box').classList.remove('hidden');
+
+            if (userAns === currentQuizData.answer) {
+                quizScoreCorrect++;
+                feedbackBox.className = "p-4 rounded-xl text-center text-sm font-bold bg-emerald-100 text-emerald-800 border border-emerald-300";
+                feedbackBox.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i>정답입니다! 완벽해요! 🎉`;
+                
+                if (window.confetti) {
+                    confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+                }
+            } else {
+                feedbackBox.className = "p-4 rounded-xl text-center text-sm font-bold bg-rose-100 text-rose-800 border border-rose-300";
+                feedbackBox.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 mr-2"></i>아쉽네요! 정답은 <span class="underline font-mono-num">${currentQuizData.answer}</span> 입니다.`;
+            }
+
+            document.getElementById('quiz-score').textContent = `${quizScoreCorrect} / ${quizScoreTotal}`;
+            feedbackBox.classList.remove('hidden');
+        }
+
+        function toggleQuizExplanation() {
+            const content = document.getElementById('quiz-explanation-content');
+            content.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>
